@@ -72,7 +72,8 @@ def search_and_report():
         with open(current_filename, "w", encoding="utf-8") as f:
             f.write(current_report)
     else:
-        print("変化なし、または新着情報なし。")
+        print("変化なし。生存確認メッセージを送ります。")
+        send_line("🍃 今日の藤井 風リサーチ：新着情報はありませんでした。ボットは正常に稼働中")
 
 if __name__ == "__main__":
     search_and_report()
