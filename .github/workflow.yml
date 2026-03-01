@@ -1,0 +1,23 @@
+name: Fujii Kaze News Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 日本時間の毎日午前9時
+  workflow_dispatch: # ボタン一つで手動実行も可能にする
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 line-bot-sdk python-dotenv
+      - name: Run script
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: python app.py
