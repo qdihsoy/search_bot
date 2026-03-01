@@ -3,11 +3,13 @@ name: Fujii Kaze News Check
 on:
   schedule:
     - cron: '0 0 * * *' # 日本時間の毎日午前9時
-  workflow_dispatch: # ボタン一つで手動実行も可能にする
+  workflow_dispatch:
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -20,11 +22,11 @@ jobs:
         env:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-        run: python research_fk.py
+        run: python research_artist.py
       - name: Commit and push if report is updated
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add report_fk_*.txt
+          git add report_*.txt
           git commit -m "Add latest research report" || echo "No changes to commit"
           git push
