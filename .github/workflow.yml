@@ -20,4 +20,11 @@ jobs:
         env:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-        run: python app.py
+        run: python research_fk.py
+      - name: Commit and push if report is updated
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add report_fk_*.txt
+          git commit -m "Add latest research report" || echo "No changes to commit"
+          git push
