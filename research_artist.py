@@ -51,7 +51,7 @@ def delete_old_reports():
         except Exception as e:
             print(f"⏩ スキップ (解析不能): {f}")
 
-ARTISTS = ["藤井風", "KingGnu", "BackNumber", "TOMOO", "NewJeans"]
+ARTISTS = ["藤井風", "KingGnu", "BackNumber", "TOMOO", "NewJeans", "乃木坂46"]
 
 def search_and_report():
     for artist in ARTISTS:
