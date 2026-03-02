@@ -12,6 +12,7 @@ NOTION_TOKEN = os.getenv('NOTION_TOKEN')
 NOTION_TECH_PAGE_ID = os.getenv('NOTION_TECH_PAGE_ID')
 
 client = genai.Client(api_key=GEMINI_API_KEY)
+FOLDER = "reports_tech"
 
 def create_notion_page(title, full_text):
 
@@ -46,11 +47,12 @@ def create_notion_page(title, full_text):
         print(f"❌ Notionエラー: {response.text}")
 
 def tech_research():
+    os.makedirs(FOLDER, exist_ok=True)
     today_dt = datetime.now()
     today_display_str = today_dt.strftime('%Y/%m/%d')
     filename_str = today_dt.strftime('%Y_%m_%d')
     
-    filename = f"Tech_Report_{filename_str}.txt"
+    filename = f"{FOLDER}/tech_report_{filename_str}.txt"
     
     prompt = f"""
     今日（{today_display_str}）の最新テクノロジーニュースをGoogle検索で調査し、プロフェッショナルなリサーチレポートを作成してください。
