@@ -13,6 +13,7 @@ LINE_USER_ID = os.getenv('LINE_USER_ID')
 configuration = Configuration(access_token=os.getenv('LINE_CHANNEL_ACCESS_TOKEN'))
 
 client = genai.Client(api_key=GEMINI_API_KEY)
+FOLDER = "reports_artist"
 
 def send_line(message):
     """友達全員に一括送信（Broadcast）"""
@@ -23,9 +24,8 @@ def send_line(message):
         ))
 
 def get_latest_report_info(artist):
-    files = glob.glob(f"report_{artist}_*.txt")
-    if not files:
-        return None, ""
+    files = glob.glob(f"{FOLDER}/report_{artist}_*.txt") 
+    if not files: return None, ""
     latest_file = sorted(files)[-1]
     with open(latest_file, "r", encoding="utf-8") as f:
         return latest_file, f.read().strip()
@@ -33,6 +33,7 @@ def get_latest_report_info(artist):
 ARTISTS = ["藤井風", "KingGnu", "BackNumber", "TOMOO", "NewJeans", "乃木坂46"]
 
 def search_and_report():
+    os.makedirs(FOLDER, exist_ok=True)
     no_updates_artists = []
     has_updates_reports = []
     
@@ -42,7 +43,7 @@ def search_and_report():
 
     for artist in ARTISTS:
         print(f"--- {artist} のリサーチ開始 ---")
-        new_filename = f"report_{artist}_{today_filename_str}.txt"
+        new_filename = f"{FOLDER}/report_{artist}_{today_filename_str}.txt"
         old_filename, old_content = get_latest_report_info(artist)
 
         prompt = f"""
