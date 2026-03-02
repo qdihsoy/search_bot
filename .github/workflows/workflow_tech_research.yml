@@ -27,6 +27,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add Tech_Report_*.txt
+          git add reports_tech/
           git commit -m "Add daily tech report" || echo "No changes"
           git push
