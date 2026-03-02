@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, PushMessageRequest, TextMessage
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime
 
 load_dotenv()
 
@@ -22,57 +22,45 @@ def send_line(message):
             messages=[TextMessage(text=message)]
         ))
 
-def get_latest_report(artist):
-    """既存の report_{artist}_*.txt の中で一番新しいファイルの内容を読み込む"""
+def get_latest_report_info(artist):
+    """
+    既存の report_{artist}_*.txt を探し、
+    (ファイル名, 中身) のセットを返す。なければ (None, "")
+    """
     files = glob.glob(f"report_{artist}_*.txt")
     if not files:
-        return ""
+        return None, ""
 
     latest_file = sorted(files)[-1]
-    print(f"📄 前回の参照ファイル: {latest_file}")
+    print(f"📄 既存のレポートを読み込みます: {latest_file}")
     with open(latest_file, "r", encoding="utf-8") as f:
-        return f.read().strip()
-
-def delete_old_reports():
-    """5日以上前のレポートファイルを削除する"""
-    print("--- 古いレポートの整理開始 ---")
-    files = glob.glob("report_*.txt")
-    threshold_date = datetime.now() - timedelta(days=5)
-    
-    for f in files:
-        try:
-            parts = f.replace(".txt", "").split("_")
-            date_str = "_".join(parts[-3:]) 
-            file_date = datetime.strptime(date_str, '%Y_%m_%d')
-            
-            if file_date < threshold_date:
-                os.remove(f)
-                print(f"🗑️ 古いレポートを削除しました: {f}")
-        except Exception as e:
-            print(f"⏩ スキップ (解析不能): {f}")
+        return latest_file, f.read().strip()
 
 ARTISTS = ["藤井風", "KingGnu", "BackNumber", "TOMOO", "NewJeans", "乃木坂46"]
 
 def search_and_report():
     for artist in ARTISTS:
-        print("--- Geminiによる最新情報リサーチ開始 ---")
+        print(f"--- {artist} のリサーチ開始 ---")
         
-        today_str = datetime.now().strftime('%Y_%m_%d')
-        current_filename = f"report_{artist}_{today_str}.txt"
+        today_dt = datetime.now()
+        today_filename_str = today_dt.strftime('%Y_%m_%d')
+        today_display_str = today_dt.strftime('%Y/%m/%d')
         
-        last_report = get_latest_report(artist)
+        new_filename = f"report_{artist}_{today_filename_str}.txt"
+        
+        old_filename, old_content = get_latest_report_info(artist)
 
         prompt = f"""
         {artist}に関する最新情報をGoogle検索で調査してください。
         特に「新曲のリリース」「ライブ・ツアーの開催」「チケットの販売（先行予約含む）」に焦点を当ててください。
         
         【ルール】
-        ・今日（{today_str}）時点での最新ニュースを3行程度で箇条書きにして。
+        ・今日（{today_display_str}）時点での最新ニュースを3行程度で箇条書きにして。
         ・関連する公式サイトや公式ニュースのURLを必ず1つ以上含めて。
-        ・もし前回（以下）の内容と本質的に同じ場合は「特になし」と答えて。
+        ・もし前回のリサーチ結果（以下）と本質的に同じ場合は「特になし」と答えて。
         
-        前回知っていた情報：
-        {last_report}
+        前回のリサーチ結果：
+        {old_content[:1000]}  # 長くなりすぎないよう直近1000文字程度を参照
         """
 
         response = client.models.generate_content(
@@ -86,16 +74,30 @@ def search_and_report():
         current_report = response.text.strip()
         print(f"Geminiの回答: \n{current_report}")
 
-        if "特になし" not in current_report and current_report != last_report:
-            print(f"✨ 新着あり！ファイル {current_filename} を作成し、LINEに送ります。")
-            send_line(f" {artist} 最新リサーチ報告\n\n{current_report}")
+        if "特になし" not in current_report:
+            print(f"✨ 新着あり！{new_filename} を更新し、LINEに送ります。")
+            
+            separator = "\n\n" + "="*30 + "\n\n"
+            header = f"📅 {today_display_str} のリサーチ\n"
+            
+            updated_content = f"{header}{current_report}{separator}{old_content}"
+            
+            with open(new_filename, "w", encoding="utf-8") as f:
+                f.write(updated_content.strip())
+            
+            if old_filename and old_filename != new_filename:
+                os.remove(old_filename)
+                print(f"🗑️ 旧ファイルを削除しました: {old_filename}")
 
-            with open(current_filename, "w", encoding="utf-8") as f:
-                f.write(current_report)
+            send_line(f"【{artist}】最新リサーチ報告\n\n{current_report}")
+
         else:
-            print("変化なし。生存確認メッセージを送ります。")
-            send_line(f" 今日の{artist}リサーチ：新着情報はありませんでした。ボットは正常に稼働中")
+            print(f"✅ {artist}：変化なし。")
+            if old_filename and old_filename != new_filename:
+                os.rename(old_filename, new_filename)
+                print(f"♻️ 内容不変のためファイル名のみ更新: {new_filename}")
+            
+            send_line(f"今日の{artist}リサーチ：新着情報はありませんでした。")
 
 if __name__ == "__main__":
-    delete_old_reports()
     search_and_report()
