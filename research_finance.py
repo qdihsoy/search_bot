@@ -14,7 +14,8 @@ NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 def create_notion_page(title, full_text):
-    """Notionデータベースに新しいページを作成し、本文を書き込む"""
+    PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
+    
     headers = {
         "Authorization": f"Bearer {NOTION_TOKEN}",
         "Content-Type": "application/json",
@@ -22,29 +23,27 @@ def create_notion_page(title, full_text):
     }
 
     blocks = []
-    lines = full_text.split("\n")
-    for line in lines:
+    for line in full_text.split("\n"):
         if line.strip():
             blocks.append({
                 "object": "block",
                 "type": "paragraph",
-                "paragraph": {
-                    "rich_text": [{"text": {"content": line}}]
-                }
+                "paragraph": {"rich_text": [{"text": {"content": line}}]}
             })
 
     data = {
-        "parent": {"database_id": NOTION_DATABASE_ID},
+        "parent": { "page_id": PARENT_PAGE_ID },
         "properties": {
-            "タイトル": {"title": [{"text": {"content": title}}]},
-            "日付": {"date": {"start": datetime.now().isoformat()}}
+            "title": [
+                { "text": { "content": title } }
+            ]
         },
         "children": blocks
     }
     
     response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     if response.status_code == 200:
-        print("✅ Notionに詳細レポートを投稿しました。")
+        print(f"✅ ページ '{title}' を作成しました。")
     else:
         print(f"❌ Notionエラー: {response.text}")
 
