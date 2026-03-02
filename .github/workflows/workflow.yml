@@ -1,4 +1,4 @@
-name: Fujii Kaze News Check
+name: Artists News Check
 
 on:
   schedule:
