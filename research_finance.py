@@ -9,12 +9,11 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 NOTION_TOKEN = os.getenv('NOTION_TOKEN')
-NOTION_DATABASE_ID = os.getenv('NOTION_DATABASE_ID')
+TARGET_BLOCK_ID = os.getenv('TARGET_BLOCK_ID')
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 def create_notion_page(title, full_text):
-    PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
     
     headers = {
         "Authorization": f"Bearer {NOTION_TOKEN}",
@@ -32,7 +31,7 @@ def create_notion_page(title, full_text):
             })
 
     data = {
-        "parent": { "page_id": PARENT_PAGE_ID },
+        "parent": { "block_id": TARGET_BLOCK_ID },
         "properties": {
             "title": [
                 { "text": { "content": title } }
