@@ -9,7 +9,7 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 NOTION_TOKEN = os.getenv('NOTION_TOKEN')
-NOTION_PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
+NOTION_FINANCE_PAGE_ID = os.getenv('NOTION_FINANCE_PAGE_ID')
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -31,14 +31,14 @@ def create_notion_page(title, full_text):
             })
 
     data = {
-        "parent": { "page_id": NOTION_PARENT_PAGE_ID }, 
+        "parent": { "page_id": NOTION_FINANCE_PAGE_ID }, 
         "properties": {
             "title": [{"text": {"content": title}}]
         },
         "children": blocks
     }
     
-    print(f"📡 Notionへ送信中... 親ページID: {NOTION_PARENT_PAGE_ID}")
+    print(f"📡 Notionへ送信中... 親ページID: {NOTION_FINANCE_PAGE_ID}")
     response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     
     if response.status_code == 200:
