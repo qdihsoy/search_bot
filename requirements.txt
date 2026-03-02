@@ -3,3 +3,4 @@ beautifulsoup4
 google-genai
 python-dotenv
 line-bot-sdk
+notion-client
