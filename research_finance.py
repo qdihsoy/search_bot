@@ -12,6 +12,7 @@ NOTION_TOKEN = os.getenv('NOTION_TOKEN')
 NOTION_FINANCE_PAGE_ID = os.getenv('NOTION_FINANCE_PAGE_ID')
 
 client = genai.Client(api_key=GEMINI_API_KEY)
+FOLDER = "reports_finance"
 
 def create_notion_page(title, full_text):
     
@@ -46,11 +47,12 @@ def create_notion_page(title, full_text):
         print(f"❌ Notionエラー: {response.text}")
 
 def financial_research():
+    os.makedirs(FOLDER, exist_ok=True)
     today_dt = datetime.now()
     today_display_str = today_dt.strftime('%Y/%m/%d')
     filename_str = today_dt.strftime('%Y_%m_%d')
     
-    filename = f"Finance_Report_{filename_str}.txt"
+    filename = f"{FOLDER}/finance_report_{filename_str}.txt"
 
     prompt = f"""
     今日（{today_display_str}）の金融・経済市場について、詳細なリサーチレポートを作成してください。
