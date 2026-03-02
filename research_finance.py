@@ -31,14 +31,14 @@ def create_notion_page(title, full_text):
             })
 
     data = {
-        "parent": { "page_id": PARENT_PAGE_ID }, 
+        "parent": { "page_id": NOTION_PARENT_PAGE_ID }, 
         "properties": {
             "title": [{"text": {"content": title}}]
         },
         "children": blocks
     }
     
-    print(f"📡 Notionへ送信中... 親ページID: {PARENT_PAGE_ID}")
+    print(f"📡 Notionへ送信中... 親ページID: {NOTION_PARENT_PAGE_ID}")
     response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     
     if response.status_code == 200:
@@ -56,6 +56,11 @@ def financial_research():
 
     prompt = f"""
     今日（{today_display_str}）の金融・経済市場について、詳細なリサーチレポートを作成してください。
+    
+    【【【超重要ルール】】】
+    ・「〇〇」や「△△」などの伏せ字、テンプレート形式での回答は【絶対に禁止】です。
+    ・必ず検索結果から得られた【具体的な数値（日経平均の終値、ドル円のレート、%など）】を明記してください。
+    ・具体的な数値がまだ出ていない場合は、直近（昨晩や数時間前）の確定数値を採用してください。
     
     以下の項目を網羅し、各項目について専門的な視点で詳しく記述してください。
     1. 主要指数の動き（日経平均、NYダウ、S&P500、NASDAQ等）
