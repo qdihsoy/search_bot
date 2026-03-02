@@ -34,10 +34,10 @@ def get_latest_report(artist):
         return f.read().strip()
 
 def delete_old_reports():
-    """14日以上前のレポートファイルを削除する"""
+    """5日以上前のレポートファイルを削除する"""
     print("--- 古いレポートの整理開始 ---")
     files = glob.glob("report_*.txt")
-    threshold_date = datetime.now() - timedelta(days=14)
+    threshold_date = datetime.now() - timedelta(days=5)
     
     for f in files:
         try:
