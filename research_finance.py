@@ -9,7 +9,7 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 NOTION_TOKEN = os.getenv('NOTION_TOKEN')
-PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
+NOTION_PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
