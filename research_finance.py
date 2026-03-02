@@ -9,16 +9,11 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 NOTION_TOKEN = os.getenv('NOTION_TOKEN')
-TARGET_BLOCK_ID = os.getenv('TARGET_BLOCK_ID')
+PARENT_PAGE_ID = os.getenv('NOTION_PARENT_PAGE_ID')
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 def create_notion_page(title, full_text):
-    """URLのメインIDを親として、その中に新しいページを作成する"""
-    
-    # 1. あなたのNotionページURLから抽出した「ページ本体のID」です
-    # URL: https://www.notion.so/2b4c2b5a287780b58d7afb60b014c40f...
-    PARENT_PAGE_ID = "317c2b5a287780ff8e9ae4987f0bd02f"
     
     headers = {
         "Authorization": f"Bearer {NOTION_TOKEN}",
@@ -26,7 +21,6 @@ def create_notion_page(title, full_text):
         "Notion-Version": "2022-06-28"
     }
 
-    # 本文をブロックに分割
     blocks = []
     for line in full_text.split("\n"):
         if line.strip():
@@ -36,7 +30,6 @@ def create_notion_page(title, full_text):
                 "paragraph": {"rich_text": [{"text": {"content": line}}]}
             })
 
-    # 【重要】データ構造を「page_id」に固定します
     data = {
         "parent": { "page_id": PARENT_PAGE_ID }, 
         "properties": {
