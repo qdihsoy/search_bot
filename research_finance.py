@@ -38,16 +38,14 @@ def create_notion_page(title, full_text):
         "children": blocks
     }
     
-    print(f"📡 Notionへ送信中... 親ページID: {NOTION_FINANCE_PAGE_ID}")
     response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
     
     if response.status_code == 200:
-        print(f"✅ 成功！ページ '{title}' を作成しました。")
+        print(f"✅ ページ '{title}' を作成しました。")
     else:
         print(f"❌ Notionエラー: {response.text}")
 
 def financial_research():
-    print("--- 総合金融リサーチ開始 ---")
     today_dt = datetime.now()
     today_display_str = today_dt.strftime('%Y/%m/%d')
     filename_str = today_dt.strftime('%Y_%m_%d')
@@ -83,7 +81,6 @@ def financial_research():
     )
 
     full_report = response.text.strip()
-    
     lines = full_report.split("\n")
     title = lines[0] if lines else f"金融リサーチ {today_display_str}"
     

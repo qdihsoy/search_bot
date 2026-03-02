@@ -14,9 +14,6 @@ NOTION_TECH_PAGE_ID = os.getenv('NOTION_TECH_PAGE_ID')
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 def create_notion_page(title, full_text):
-    if not NOTION_TECH_PAGE_ID:
-        print("❌ エラー: NOTION_TECH_PAGE_ID が設定されていません。")
-        return
 
     headers = {
         "Authorization": f"Bearer {NOTION_TOKEN}",
@@ -42,17 +39,21 @@ def create_notion_page(title, full_text):
     }
     
     response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
+    
     if response.status_code == 200:
-        print(f"✅ Notion成功: {title}")
+        print(f"✅ ページ '{title}' を作成しました。")
     else:
         print(f"❌ Notionエラー: {response.text}")
 
 def tech_research():
-    today_str = datetime.now().strftime('%Y/%m/%d')
-    print(f"--- {today_str} テック・最新技術リサーチ開始 ---")
+    today_dt = datetime.now()
+    today_display_str = today_dt.strftime('%Y/%m/%d')
+    filename_str = today_dt.strftime('%Y_%m_%d')
+    
+    filename = f"Tech_Report_{filename_str}.txt"
     
     prompt = f"""
-    今日（{today_str}）の最新テクノロジーニュースをGoogle検索で調査し、プロフェッショナルなリサーチレポートを作成してください。
+    今日（{today_display_str}）の最新テクノロジーニュースをGoogle検索で調査し、プロフェッショナルなリサーチレポートを作成してください。
     
     【【【絶対厳守】】】
     ・「〇〇」や「今後の動向が注目されます」といった中身のない表現は【禁止】です。
@@ -79,7 +80,11 @@ def tech_research():
 
     full_report = response.text.strip()
     lines = full_report.split("\n")
-    title = lines[0] if lines else f"テックリサーチ {today_str}"
+    title = lines[0] if lines else f"テックリサーチ {today_display_str}"
+    
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(full_report)
+    print(f"📄 ファイル保存完了: {filename}")
     
     create_notion_page(title, full_report)
 
