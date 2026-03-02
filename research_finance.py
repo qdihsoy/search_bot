@@ -52,7 +52,7 @@ def financial_research():
     today_display_str = today_dt.strftime('%Y/%m/%d')
     filename_str = today_dt.strftime('%Y_%m_%d')
     
-    filename = f"finance_report_{filename_str}.txt"
+    filename = f"Finance_Report_{filename_str}.txt"
 
     prompt = f"""
     今日（{today_display_str}）の金融・経済市場について、詳細なリサーチレポートを作成してください。
