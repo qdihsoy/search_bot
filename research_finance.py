@@ -3,7 +3,7 @@ import requests
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 
