@@ -3,7 +3,7 @@ import requests
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -49,8 +49,10 @@ def create_notion_page(title, full_text):
 def tech_research():
     os.makedirs(FOLDER, exist_ok=True)
     today_dt = datetime.now()
+    report_dt = datetime.now() + timedelta(days=1) #UTC22時に実行されるため、1日加算する
     today_display_str = today_dt.strftime('%Y/%m/%d')
-    filename_str = today_dt.strftime('%Y_%m_%d')
+    filename_str = report_dt.strftime('%Y_%m_%d')
+    
     
     filename = f"{FOLDER}/tech_report_{filename_str}.txt"
     
@@ -69,7 +71,7 @@ def tech_research():
     4. 注目すべきテック企業の株価やビジネス動向
     5. 技術的な要点まとめ
 
-    1行目をタイトル（例：2026/03/02 テック概況 - OpenAIの新型モデル発表など）とし、2行目以降を本文にしてください。
+    1行目をタイトル（例：{filename_str} テック概況 - OpenAIの新型モデル発表など）とし、2行目以降を本文にしてください。
     """
 
     response = client.models.generate_content(
@@ -82,7 +84,7 @@ def tech_research():
 
     full_report = response.text.strip()
     lines = full_report.split("\n")
-    title = lines[0] if lines else f"テックリサーチ {today_display_str}"
+    title = lines[0] if lines else f"テックリサーチ {filename_str}"
     
     with open(filename, "w", encoding="utf-8") as f:
         f.write(full_report)

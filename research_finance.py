@@ -83,7 +83,7 @@ def financial_research():
     - **リスク要因**: どこまで下がったらシナリオ崩壊（損切り）か。
     
     【回答形式】
-    1行目：レポートのタイトル（例：2026/03/02 金融市場概況 - 〇〇の上昇と円安の背景）
+    1行目：レポートのタイトル（例：{filename_str} 金融市場概況 - 〇〇の上昇と円安の背景）
     2行目以降：上記項目に沿った詳細な本文（マークダウン形式で読みやすく）
     """
 
@@ -97,7 +97,7 @@ def financial_research():
 
     full_report = response.text.strip()
     lines = full_report.split("\n")
-    title = lines[0] if lines else f"金融リサーチ {today_display_str}"
+    title = lines[0] if lines else f"金融リサーチ {filename_str}"
     
     with open(filename, "w", encoding="utf-8") as f:
         f.write(full_report)
